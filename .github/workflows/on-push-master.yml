@@ -9,13 +9,25 @@ on:
       - ".github/**"
       - "*.md"
 
+# Least privilege by default; each job requests only what it needs.
+permissions:
+  contents: read
+
 jobs:
   run-tests:
+    # checkout of the target ref + upload of the test-results artifact
+    permissions:
+      contents: read
+      actions: write
     uses: ./.github/workflows/run-tests.yml
     with:
       target: ${{ github.event.ref }}
 
   publish-release:
+    # build artifact upload/download + create/replace the GitHub release and its assets
+    permissions:
+      contents: write
+      actions: write
     uses: ./.github/workflows/publish-release.yml
     with:
       target: ${{ github.event.ref }}

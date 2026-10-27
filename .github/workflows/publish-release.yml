@@ -34,6 +34,10 @@ on:
         default: false
         type: boolean
 
+# Least privilege by default; each job requests only what it needs.
+permissions:
+  contents: read
+
 env:
   CI_DIR: 2049ef39-42a2-46d2-b513-ee6d2e3a7b15
   RELEASES: |
@@ -94,11 +98,19 @@ env:
 
 jobs:
   build:
+    # checkout of the target ref + upload of the build artifact
+    permissions:
+      contents: read
+      actions: write
     uses: ./.github/workflows/build.yml
     with:
       target: ${{ inputs.target }}
 
   publish-release:
+    # download the build artifact + create/replace the GitHub release and its assets
+    permissions:
+      contents: write
+      actions: read
     runs-on: ubuntu-latest
     needs: [build]
     steps:
